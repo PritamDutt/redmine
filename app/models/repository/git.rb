@@ -152,6 +152,11 @@ class Repository::Git < Repository
     save_revisions(prev_db_heads, repo_heads)
   end
 
+  def fetch_all
+    # Invoke fetch all of the scm - currently git
+    scm.fetch_all
+  end
+
   def save_revisions(prev_db_heads, repo_heads)
     h = {}
     opts = {}

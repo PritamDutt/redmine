@@ -69,6 +69,8 @@ class SysController < ActionController::Base
     end
     projects.each do |project|
       project.repositories.each do |repository|
+        # Invoke fetch_all only if processing Git Repo
+        repository.fetch_all if repository.scm_adapter == Redmine::Scm::Adapters::GitAdapter
         repository.fetch_changesets
       end
     end

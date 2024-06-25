@@ -94,6 +94,13 @@ module Redmine
           nil
         end
 
+        def fetch_all
+          # Fetch all branches on origin
+          # Using origin "*:*" instead of --all as found this more reliable
+          cmd_args = %w|fetch --verbose -t origin "*:*" |
+          git_cmd(cmd_args) # {|io| puts io.readlines}
+        end
+
         def tags
           return @tags if @tags
 

@@ -74,7 +74,7 @@ en:
   number:
     format:
       separator: "."
-      delimiter: ""
+      delimiter: ","
       precision: 3
 
     human:
@@ -194,7 +194,7 @@ en:
   notice_issue_not_closable_by_open_tasks: "This issue cannot be closed because it has at least one open subtask."
   notice_issue_not_closable_by_blocking_issue: "This issue cannot be closed because it is blocked by at least one open issue."
   notice_issue_not_reopenable_by_closed_parent_issue: "This issue cannot be reopened because its parent issue is closed."
-  notice_invalid_watcher: "Invalid watcher: User will not receive any notifications because it does not have access to view this object."
+  notice_invalid_watcher: "Invalid watcher: User will not receive any notifications because they do not have access to view this object."
 
   error_can_t_load_default_data: "Default configuration could not be loaded: %{value}"
   error_scm_not_found: "The entry or revision was not found in the repository."
@@ -421,6 +421,7 @@ en:
   field_any_searchable: Any searchable text
   field_estimated_remaining_hours: Estimated remaining time
   field_last_activity_date: Last activity
+  field_thousands_delimiter: Thousands delimiter
 
   setting_app_title: Application title
   setting_welcome_text: Welcome text
@@ -503,6 +504,7 @@ en:
   setting_force_default_language_for_anonymous: Force default language for anonymous users
   setting_force_default_language_for_loggedin: Force default language for logged-in users
   setting_link_copied_issue: Link issues on copy
+  setting_copy_attachments_on_issue_copy: Copy attachments on copy
   setting_max_additional_emails: Maximum number of additional email addresses
   setting_email_domains_allowed: Allowed email domains
   setting_email_domains_denied: Disallowed email domains

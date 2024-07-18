@@ -79,7 +79,7 @@ zh:
     # Default format for numbers
     format:
       separator: "."
-      delimiter: ""
+      delimiter: ","
       precision: 3
     human:
       format:
@@ -1427,3 +1427,5 @@ zh:
   field_estimated_remaining_hours: Estimated remaining time
   field_last_activity_date: Last activity
   setting_issue_done_ratio_interval: Done ratio options interval
+  setting_copy_attachments_on_issue_copy: Copy attachments on copy
+  field_thousands_delimiter: Thousands delimiter

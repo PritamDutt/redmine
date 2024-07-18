@@ -231,15 +231,19 @@ class UsersController < ApplicationController
     @users = User.logged.where(id: params[:ids]).where.not(id: User.current)
     (render_404; return) unless @users.any?
 
-    if params[:lock]
-      @users.update_all status: User::STATUS_LOCKED
-      flash[:notice] = l(:notice_successful_update)
-      redirect_to users_path
-    elsif params[:confirm] == I18n.t(:general_text_Yes)
+    if params[:confirm] == I18n.t(:general_text_Yes)
       @users.destroy_all
       flash[:notice] = l(:notice_successful_delete)
       redirect_to users_path
     end
+  end
+
+  def bulk_lock
+    bulk_update_status(params[:ids], User::STATUS_LOCKED)
+  end
+
+  def bulk_unlock
+    bulk_update_status(params[:ids], User::STATUS_ACTIVE)
   end
 
   private
@@ -255,5 +259,14 @@ class UsersController < ApplicationController
     end
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+
+  def bulk_update_status(user_ids, status)
+    users = User.logged.where(id: user_ids).where.not(id: User.current)
+    (render_404; return) unless users.any?
+
+    users.update_all status: status
+    flash[:notice] = l(:notice_successful_update)
+    redirect_to users_path
   end
 end

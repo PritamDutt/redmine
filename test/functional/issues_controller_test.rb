@@ -2801,6 +2801,17 @@ class IssuesControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_show_should_not_display_watchers_without_permission
+    @request.session[:user_id] = 2
+    Role.find(1).remove_permission! :view_issue_watchers
+    issue = Issue.find(1)
+    issue.add_watcher User.find(2)
+    issue.add_watcher Group.find(10)
+    get(:show, :params => {:id => 1})
+    assert_select 'div#watchers ul', 0
+    assert_select 'h3', {text: /Watchers \(\d*\)/, count: 0}
+  end
+
   def test_show_should_display_watchers_with_gravatars
     @request.session[:user_id] = 2
     issue = Issue.find(1)
@@ -5613,6 +5624,47 @@ class IssuesControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_create_as_copy_should_always_copy_attachments_by_settings
+    assert_equal 4, Issue.find(3).attachments.size
+    with_settings :copy_attachments_on_issue_copy => 'yes' do
+      @request.session[:user_id] = 2
+      assert_difference 'Issue.count' do
+        assert_difference 'Attachment.count', 4 do
+          post(
+            :create,
+            :params => {
+              :project_id => 1,
+              :copy_from => 3,
+              :issue => {
+                :subject => 'Copy'
+              }
+            }
+          )
+        end
+      end
+    end
+  end
+
+  def test_create_as_copy_should_never_copy_attachments_by_settings
+    with_settings :copy_attachments_on_issue_copy => 'no' do
+      @request.session[:user_id] = 2
+      assert_difference 'Issue.count' do
+        assert_no_difference 'Attachment.count' do
+          post(
+            :create,
+            :params => {
+              :project_id => 1,
+              :copy_from => 3,
+              :issue => {
+                :subject => 'Copy'
+              }
+            }
+          )
+        end
+      end
+    end
+  end
+
   def test_create_as_copy_should_copy_subtasks
     @request.session[:user_id] = 2
     issue = Issue.generate_with_descendants!
@@ -8074,6 +8126,47 @@ class IssuesControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_bulk_copy_should_never_copy_attachments_by_settings
+    with_settings :copy_attachments_on_issue_copy => 'no' do
+      @request.session[:user_id] = 2
+      assert_difference 'Issue.count' do
+        assert_no_difference 'Attachment.count' do
+          post(
+            :bulk_update,
+            :params => {
+              :ids => [3],
+              :copy => '1',
+              :issue => {
+                :project_id => ''
+              }
+            }
+          )
+        end
+      end
+    end
+  end
+
+  def test_bulk_copy_should_always_copy_attachments_by_settings
+    assert_equal 4, Issue.find(3).attachments.size
+    with_settings :copy_attachments_on_issue_copy => 'yes' do
+      @request.session[:user_id] = 2
+      assert_difference 'Issue.count' do
+        assert_difference 'Attachment.count', 4 do
+          post(
+            :bulk_update,
+            :params => {
+              :ids => [3],
+              :copy => '1',
+              :issue => {
+                :project_id => ''
+              }
+            }
+          )
+        end
+      end
+    end
+  end
+
   def test_bulk_copy_should_add_relations_with_copied_issues
     @request.session[:user_id] = 2
     assert_difference 'Issue.count', 2 do
@@ -8272,14 +8365,16 @@ class IssuesControllerTest < Redmine::ControllerTest
     leaf = Issue.generate!
     TimeEntry.generate!(:issue => leaf)
     @request.session[:user_id] = 2
-    delete(
-      :destroy,
-      :params => {
-        :ids => [parent.id, leaf.id]
-      }
-    )
+    with_settings :timespan_format => 'minutes' do
+      delete(
+        :destroy,
+        :params => {
+          :ids => [parent.id, leaf.id]
+        }
+      )
+    end
     assert_response :success
-    assert_select 'p', :text => /3\.00 hours were reported/
+    assert_select 'p', :text => /3:00 hours were reported/
   end
 
   def test_destroy_issues_and_destroy_time_entries

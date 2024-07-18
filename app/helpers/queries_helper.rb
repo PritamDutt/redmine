@@ -305,7 +305,7 @@ module QueriesHelper
     when :watcher_users
       value.to_a.join("\n")
     else
-      format_object(value, false) do |value|
+      format_object(value, html: false) do |value|
         case value.class.name
         when 'Float'
           sprintf("%.2f", value).gsub('.', l(:general_csv_decimal_separator))
@@ -507,7 +507,8 @@ module QueriesHelper
                       link_to(query.name,
                               url_params.merge(:query_id => query),
                               :class => css,
-                              :title => query.description) +
+                              :title => query.description,
+                              :data => { :disable_with => query.name }) +
                         clear_link.html_safe)
         end.join("\n").html_safe,
         :class => 'queries'

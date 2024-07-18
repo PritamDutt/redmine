@@ -21,6 +21,15 @@
       </li>
     <% end %>
   <% else %>
+    <% unless @users.all?(&:locked?) %>
+      <li>
+        <%= context_menu_link l(:button_lock), bulk_lock_users_path(ids: @users.map(&:id)), method: :post, class: 'icon icon-lock' %>
+      </li>
+    <% else %>
+      <li>
+        <%= context_menu_link l(:button_unlock), bulk_unlock_users_path(ids: @users.map(&:id)), method: :post, class: 'icon icon-unlock' %>
+      </li>
+    <% end %>
     <li>
       <%= context_menu_link l(:button_delete),
         {controller: 'users', action: 'bulk_destroy', ids: @users.map(&:id)},

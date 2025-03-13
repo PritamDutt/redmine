@@ -355,6 +355,8 @@ class Query < ApplicationRecord
   # Permission required to view the queries, set on subclasses.
   class_attribute :view_permission
 
+  class_attribute :layout, default: 'base'
+
   # Scope of queries that are global or on the given project
   scope :global_or_on_project, (lambda do |project|
     where(:project_id => (project.nil? ? nil : [nil, project.id]))
@@ -417,7 +419,7 @@ class Query < ApplicationRecord
       true
     when VISIBILITY_ROLES
       if project
-        (user.roles_for_project(project) & roles).any?
+        user.roles_for_project(project).intersect?(roles)
       else
         user.memberships.joins(:member_roles).where(:member_roles => {:role_id => roles.map(&:id)}).any?
       end
@@ -628,7 +630,7 @@ class Query < ApplicationRecord
     author_values = []
     author_values << ["<< #{l(:label_me)} >>", "me"] if User.current.logged?
     author_values +=
-      users.sort_by(&:status).
+      users.sort_by{|p| [p.status, p]}.
         collect{|s| [s.name, s.id.to_s, l("status_#{User::LABEL_BY_STATUS[s.status]}")]}
     author_values << [l(:label_user_anonymous), User.anonymous.id.to_s]
     author_values
@@ -638,7 +640,7 @@ class Query < ApplicationRecord
     assigned_to_values = []
     assigned_to_values << ["<< #{l(:label_me)} >>", "me"] if User.current.logged?
     assigned_to_values +=
-      (Setting.issue_group_assignment? ? principals : users).sort_by(&:status).
+      (Setting.issue_group_assignment? ? principals : users).sort_by{|p| [p.status, p]}.
         collect{|s| [s.name, s.id.to_s, l("status_#{User::LABEL_BY_STATUS[s.status]}")]}
     assigned_to_values
   end
@@ -668,7 +670,7 @@ class Query < ApplicationRecord
     watcher_values = [["<< #{l(:label_me)} >>", "me"]]
     if User.current.allowed_to?(:view_issue_watchers, self.project, global: true)
       watcher_values +=
-        principals.sort_by(&:status).
+        principals.sort_by{|p| [p.status, p]}.
           collect{|s| [s.name, s.id.to_s, l("status_#{User::LABEL_BY_STATUS[s.status]}")]}
     end
     watcher_values
@@ -1004,7 +1006,7 @@ class Query < ApplicationRecord
         end
       end
 
-      if field == 'project_id' || (self.type == 'ProjectQuery' && %w[id parent_id].include?(field))
+      if field == 'project_id' || (is_a?(ProjectQuery) && %w[id parent_id].include?(field))
         if v.delete('mine')
           v += User.current.memberships.pluck(:project_id).map(&:to_s)
         end
@@ -1097,7 +1099,7 @@ class Query < ApplicationRecord
 
   private
 
-  def grouped_query(&block)
+  def grouped_query(&)
     r = nil
     if grouped?
       r = yield base_group_scope
@@ -1136,13 +1138,13 @@ class Query < ApplicationRecord
       group(group_by_statement)
   end
 
-  def total_for_custom_field(custom_field, scope, &block)
+  def total_for_custom_field(custom_field, scope, &)
     total = custom_field.format.total_for_scope(custom_field, scope)
     total = map_total(total) {|t| custom_field.format.cast_total_value(custom_field, t)}
     total
   end
 
-  def map_total(total, &block)
+  def map_total(total, &)
     if total.is_a?(Hash)
       total.each_key {|k| total[k] = yield total[k]}
     else
@@ -1207,7 +1209,6 @@ class Query < ApplicationRecord
       "  SELECT customized_id FROM #{CustomValue.table_name}" +
       "  WHERE customized_type='#{target_class}' AND custom_field_id=#{chained_custom_field_id}" +
       "  AND #{sql_for_field(field, operator, value, CustomValue.table_name, 'value', true)}))"
-
   end
 
   def sql_for_custom_field_attribute(field, operator, value, custom_field_id, attribute)

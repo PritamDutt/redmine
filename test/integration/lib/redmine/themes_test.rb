@@ -20,7 +20,6 @@
 require_relative '../../../test_helper'
 
 class ThemesTest < Redmine::IntegrationTest
-
   def setup
     Redmine::Themes.rescan
     @theme = Redmine::Themes.theme('classic')
@@ -101,5 +100,26 @@ class ThemesTest < Redmine::IntegrationTest
     assert_select 'link[rel="shortcut icon"][href^=?]', "/foo/assets/themes/#{@theme.dir}/a.ico"
   ensure
     Redmine::Utils.relative_url_root = ''
+  end
+
+  def test_body_css_class_with_spaces_in_theme_name
+    @theme.instance_variable_set(:@name, 'Foo bar baz')
+    get '/'
+
+    assert_response :success
+    assert_select 'body[class~="theme-Foo_bar_baz"]'
+  end
+
+  def test_old_theme_compatibility
+    @theme = Redmine::Themes::Theme.new(Rails.root.join('test/fixtures/themes/foo_theme'))
+    Rails.application.config.assets.redmine_extension_paths << @theme.asset_paths
+    Setting.ui_theme = @theme.id
+    Rails.application.assets.load_path.clear_cache
+
+    asset = Rails.application.assets.load_path.find('themes/foo_theme/application.css')
+    get "/assets/#{asset.digested_path}"
+
+    assert_response :success
+    assert_match %r{url\("/assets/application-\w+\.css"\)}, response.body
   end
 end

@@ -20,13 +20,6 @@
 require_relative '../test_helper'
 
 class GroupTest < ActiveSupport::TestCase
-  fixtures :projects, :trackers, :issue_statuses, :issues,
-           :enumerations, :users,
-           :projects_trackers,
-           :roles, :member_roles, :members,
-           :groups_users,
-           :watchers
-
   include Redmine::I18n
 
   def setup
@@ -38,6 +31,7 @@ class GroupTest < ActiveSupport::TestCase
     assert g.save
     g.reload
     assert_equal 'New group', g.name
+    assert_equal true, g.active?
   end
 
   def test_name_should_accept_255_characters

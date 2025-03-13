@@ -22,9 +22,6 @@ require_relative '../test_helper'
 class RepositoriesGitControllerTest < Redmine::RepositoryControllerTest
   tests RepositoriesController
 
-  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
-           :repositories, :enabled_modules
-
   REPOSITORY_PATH = Rails.root.join('tmp/test/git_repository').to_s
   REPOSITORY_PATH.tr!('/', "\\") if Redmine::Platform.mswin?
   PRJ_ID     = 3
@@ -822,7 +819,7 @@ class RepositoriesGitControllerTest < Redmine::RepositoryControllerTest
 
   private
 
-  def with_cache(&block)
+  def with_cache(&)
     before = ActionController::Base.perform_caching
     ActionController::Base.perform_caching = true
     yield
@@ -832,6 +829,6 @@ class RepositoriesGitControllerTest < Redmine::RepositoryControllerTest
   def puts_pass_on_not_utf8
     puts "TODO: This test fails " +
          "when Encoding.default_external is not UTF-8. " +
-         "Current value is '#{Encoding.default_external.to_s}'"
+         "Current value is '#{Encoding.default_external}'"
   end
 end

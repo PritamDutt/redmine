@@ -20,12 +20,6 @@
 require_relative '../test_helper'
 
 class IssueNestedSetConcurrencyTest < ActiveSupport::TestCase
-  fixtures :projects, :users,
-           :trackers, :projects_trackers,
-           :enabled_modules,
-           :issue_statuses,
-           :enumerations
-
   self.use_transactional_tests = false
 
   def setup
@@ -36,7 +30,7 @@ class IssueNestedSetConcurrencyTest < ActiveSupport::TestCase
       ActiveRecord::Base.establish_connection connection
     end
     User.current = nil
-    CustomField.delete_all
+    CustomField.destroy_all
   end
 
   def teardown
@@ -124,7 +118,7 @@ class IssueNestedSetConcurrencyTest < ActiveSupport::TestCase
 
   private
 
-  def threaded(count, &block)
+  def threaded(count, &)
     with_settings :notified_events => [] do
       threads = []
       count.times do |i|

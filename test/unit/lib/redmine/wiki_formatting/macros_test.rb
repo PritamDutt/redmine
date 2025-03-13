@@ -23,16 +23,7 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
   include ActionView::Helpers::TextHelper
   include ActionView::Helpers::SanitizeHelper
   include ERB::Util
-  include Rails.application.routes.url_helpers
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
-
-  fixtures :projects, :roles, :enabled_modules, :users,
-           :repositories, :changesets,
-           :trackers, :issue_statuses, :issues,
-           :versions, :documents,
-           :wikis, :wiki_pages, :wiki_contents,
-           :boards, :messages,
-           :attachments, :enumerations
 
   def setup
     super
@@ -149,12 +140,12 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
 
   def test_macro_exception_should_be_displayed
     Redmine::WikiFormatting::Macros.macro :exception do |obj, args|
-      raise "My message"
+      raise "My exception's message"
     end
 
     text = "{{exception}}"
     assert_include(
-      '<div class="flash error">Error executing the <strong>exception</strong> macro (My message)</div>',
+      '<div class="flash error">Error executing the <strong>exception</strong> macro (My exception&#39;s message)</div>',
       textilizable(text)
     )
   end
@@ -277,6 +268,13 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
       assert_select_in result, 'a.collapsible.icon-collapsed', :text => 'Show example'
       assert_select_in result, 'a.collapsible.icon-expanded', :text => 'Hide example'
     end
+  end
+
+  def test_macro_collapse_with_arg_contains_comma
+    text = %|{{collapse("Click here, to see the example", Hide example)\n*Collapsed* block of text\n}}|
+    result = textilizable(text)
+    assert_select_in result, 'a.collapsible.icon-collapsed', :text => 'Click here, to see the example'
+    assert_select_in result, 'a.collapsible.icon-expanded', :text => 'Hide example'
   end
 
   def test_macro_collapse_should_not_break_toc

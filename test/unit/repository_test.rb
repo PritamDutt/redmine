@@ -20,26 +20,6 @@
 require_relative '../test_helper'
 
 class RepositoryTest < ActiveSupport::TestCase
-  fixtures :projects,
-           :trackers,
-           :projects_trackers,
-           :enabled_modules,
-           :repositories,
-           :issues,
-           :issue_statuses,
-           :issue_categories,
-           :changesets,
-           :changes,
-           :users,
-           :email_addresses,
-           :members,
-           :member_roles,
-           :roles,
-           :enumerations,
-           :user_preferences,
-           :watchers,
-           :versions
-
   include Redmine::I18n
 
   def setup
@@ -310,7 +290,7 @@ class RepositoryTest < ActiveSupport::TestCase
         )
     long_whitespace = "                                                "
     expected_comment = "This is a loooooooooooooooooooooooooooong comment"
-    comment = +"#{expected_comment}#{long_whitespace}\n"
+    comment = "#{expected_comment}#{long_whitespace}\n"
     3.times {comment << "#{long_whitespace}\n"}
     changeset = Changeset.new(
       :comments => comment, :commit_date => Time.now,

@@ -24,6 +24,7 @@ class User < Principal
   include Redmine::SafeAttributes
 
   # Different ways of displaying/sorting users
+  # rubocop:disable Lint/InterpolationCheck
   USER_FORMATS = {
     :firstname_lastname => {
       :string => '#{firstname} #{lastname}',
@@ -71,6 +72,7 @@ class User < Principal
       :setting_order => 8
     },
   }
+  # rubocop:enable Lint/InterpolationCheck
 
   MAIL_NOTIFICATION_OPTIONS = [
     ['all', :label_user_mail_option_all],
@@ -273,10 +275,6 @@ class User < Principal
     end
   end
 
-  def active?
-    self.status == STATUS_ACTIVE
-  end
-
   def registered?
     self.status == STATUS_REGISTERED
   end
@@ -373,7 +371,7 @@ class User < Principal
     end
     chars = chars_list.flatten
     length.times {password << chars[SecureRandom.random_number(chars.size)]}
-    password = password.split('').shuffle(random: SecureRandom).join
+    password = password.chars.shuffle(random: SecureRandom).join
     self.password = password
     self.password_confirmation = password
     self
@@ -770,8 +768,8 @@ class User < Principal
   # NB: this method is not used anywhere in the core codebase as of
   # 2.5.2, but it's used by many plugins so if we ever want to remove
   # it it has to be carefully deprecated for a version or two.
-  def allowed_to_globally?(action, options={}, &block)
-    allowed_to?(action, nil, options.reverse_merge(:global => true), &block)
+  def allowed_to_globally?(action, options={}, &)
+    allowed_to?(action, nil, options.reverse_merge(:global => true), &)
   end
 
   def allowed_to_view_all_time_entries?(context)
@@ -887,7 +885,7 @@ class User < Principal
     project_ids.map(&:to_i)
   end
 
-  def self.prune(age)
+  def self.prune(age=30.days)
     User.where("created_on < ? AND status = ?", Time.now - age, STATUS_REGISTERED).destroy_all
   end
 
@@ -947,6 +945,7 @@ class User < Principal
     Issue.where(['author_id = ?', id]).update_all(['author_id = ?', substitute.id])
     Issue.where(['assigned_to_id = ?', id]).update_all('assigned_to_id = NULL')
     Journal.where(['user_id = ?', id]).update_all(['user_id = ?', substitute.id])
+    Journal.where(['updated_by_id = ?', id]).update_all(['updated_by_id = ?', substitute.id])
     JournalDetail.
       where(["property = 'attr' AND prop_key = 'assigned_to_id' AND old_value = ?", id.to_s]).
       update_all(['old_value = ?', substitute.id.to_s])

@@ -20,16 +20,6 @@
 require_relative '../test_helper'
 
 class ReportsControllerTest < Redmine::ControllerTest
-  fixtures :projects, :trackers, :issue_statuses, :issues,
-           :enumerations, :users, :issue_categories,
-           :projects_trackers,
-           :roles,
-           :member_roles,
-           :members,
-           :enabled_modules,
-           :versions,
-           :workflows
-
   def test_get_issue_report
     get(
       :issue_report,
@@ -207,6 +197,17 @@ class ReportsControllerTest < Redmine::ControllerTest
       assert_select ':nth-child(8)', :text => '2' # open
       assert_select ':nth-child(9)', :text => '1' # closed
       assert_select ':nth-child(10)', :text => '3' # total
+    end
+    assert_select 'table.list tfoot :nth-child(1)' do
+      assert_select 'td', :text => 'Total'
+      assert_select ':nth-child(2)', :text => '3' # status:1
+      assert_select ':nth-child(3)', :text => '0' # status:2
+      assert_select ':nth-child(4)', :text => '0' # status:3
+      assert_select ':nth-child(5)', :text => '0' # status:4
+      assert_select ':nth-child(6)', :text => '1' # status:5
+      assert_select ':nth-child(8)', :text => '3' # open
+      assert_select ':nth-child(9)', :text => '1' # closed
+      assert_select ':nth-child(10)', :text => '4' # total
     end
   end
 

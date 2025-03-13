@@ -886,7 +886,7 @@ pt:
   error_can_not_delete_custom_field: Não foi possível apagar o campo personalizado
   error_unable_to_connect: Não foi possível ligar (%{value})
   error_can_not_remove_role: Esta função está atualmente em uso e não pode ser apagada.
-  error_can_not_delete_tracker: Existem ainda tarefas nesta categoria. Não é possível apagar este tipo de tarefa.
+  error_can_not_delete_tracker_html: Existem ainda tarefas nesta categoria. Não é possível apagar este tipo de tarefa.<p>The following projects have issues with this tracker:<br>%{projects}</p>
   field_principal: User or Group
   notice_failed_to_save_members: "Erro ao guardar o(s) membro(s): %{errors}."
   text_zoom_out: Reduzir
@@ -1486,3 +1486,9 @@ pt:
   setting_issue_done_ratio_interval: Done ratio options interval
   setting_copy_attachments_on_issue_copy: Copy attachments on copy
   field_thousands_delimiter: Thousands delimiter
+  label_involved_principals: Author / Previous assignee
+  label_attachment_summary:
+    zero: "%{filename}"
+    one: "%{filename} and 1 file"
+    other: "%{filename} and %{count} files"
+  setting_wiki_tablesort_enabled: Javascript based table sorting in wiki content

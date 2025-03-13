@@ -53,7 +53,7 @@ class Journal < ApplicationRecord
     :author_key => :user_id,
     :scope =>
       proc do
-        preload({:issue => :project}, :user).
+        preload({:issue => :project}, {:issue => :tracker}, :user).
           joins("LEFT OUTER JOIN #{JournalDetail.table_name} ON #{JournalDetail.table_name}.journal_id = #{Journal.table_name}.id").
             where("#{Journal.table_name}.journalized_type = 'Issue' AND" +
                   " (#{JournalDetail.table_name}.prop_key = 'status_id' OR #{Journal.table_name}.notes <> '')").distinct
@@ -102,6 +102,15 @@ class Journal < ApplicationRecord
     journalize_changes
     # Do not save an empty journal
     (details.empty? && notes.blank?) ? false : super()
+  end
+
+  def journalized
+    if journalized_type == 'Issue' && association(:issue).loaded?
+      # Avoid extra query by using preloaded association
+      issue
+    else
+      super
+    end
   end
 
   # Returns journal details that are visible to user
@@ -339,7 +348,7 @@ class Journal < ApplicationRecord
 
   def add_watcher
     if user&.active? &&
-        user&.allowed_to?(:add_issue_watchers, project) &&
+        user.allowed_to?(:add_issue_watchers, project) &&
         user.pref.auto_watch_on?('issue_contributed_to') &&
         !Watcher.any_watched?(Array.wrap(journalized), user)
       journalized.set_watcher(user, true)

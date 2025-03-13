@@ -394,11 +394,11 @@ module Redmine
         font_path =
           Redmine::Configuration['minimagick_font_path'].presence ||
             Redmine::Configuration['rmagick_font_path'].presence
-        img = MiniMagick::Image.create(".#{format}", false)
+        img = MiniMagick::Image.create(".#{format}")
         if Redmine::Configuration['imagemagick_convert_command'].present?
           MiniMagick.cli_path = File.dirname(Redmine::Configuration['imagemagick_convert_command'])
         end
-        MiniMagick::Tool::Convert.new do |gc|
+        MiniMagick.convert do |gc|
           gc.size('%dx%d' % [subject_width + g_width + 1, height])
           gc.xc('white')
           gc.font(font_path) if font_path.present?
@@ -723,9 +723,10 @@ module Redmine
             progress_date = calc_progress_date(issue.start_date,
                                                issue.due_before, issue.done_ratio)
             css_classes << ' behind-start-date' if progress_date < self.date_from
-            css_classes << ' over-end-date' if progress_date > self.date_to
+            css_classes << ' over-end-date' if progress_date > self.date_to && issue.done_ratio > 0
           end
           s = (+"").html_safe
+          s << view.sprite_icon('issue').html_safe unless Setting.gravatar_enabled? && issue.assigned_to
           s << view.assignee_avatar(issue.assigned_to, :size => 13, :class => 'icon-gravatar')
           s << view.link_to_issue(issue).html_safe
           s << view.content_tag(:input, nil, :type => 'checkbox', :name => 'ids[]',
@@ -743,16 +744,20 @@ module Redmine
             progress_date = calc_progress_date(version.start_date,
                                                version.due_date, version.visible_fixed_issues.completed_percent)
             html_class << ' behind-start-date' if progress_date < self.date_from
-            html_class << ' over-end-date' if progress_date > self.date_to
+            html_class << ' over-end-date' if progress_date > self.date_to && version.visible_fixed_issues.completed_percent > 0
           end
-          s = view.link_to_version(version).html_safe
+          s = (+"").html_safe
+          s << view.sprite_icon('package').html_safe
+          s << view.link_to_version(version).html_safe
           view.content_tag(:span, s, :class => html_class).html_safe
         when Project
           project = object
           html_class = +""
           html_class << 'icon icon-projects '
           html_class << (project.overdue? ? 'project-overdue' : '')
-          s = view.link_to_project(project).html_safe
+          s = (+"").html_safe
+          s << view.sprite_icon('projects').html_safe
+          s << view.link_to_project(project).html_safe
           view.content_tag(:span, s, :class => html_class).html_safe
         end
       end
@@ -768,7 +773,7 @@ module Redmine
           children = object.leaf? ? [] : object.children & project_issues(object.project)
           has_children =
             children.present? &&
-              (children.collect(&:fixed_version).uniq & [object.fixed_version]).present?
+              children.collect(&:fixed_version).uniq.intersect?([object.fixed_version])
         when Version
           tag_options[:id] = "version-#{object.id}"
           tag_options[:class] = "version-name"
@@ -787,12 +792,12 @@ module Redmine
           }
         end
         if has_children
-          content = view.content_tag(:span, nil, :class => 'icon icon-expanded expander') + content
+          content = view.content_tag(:span, view.sprite_icon('angle-down').html_safe, :class => 'icon icon-expanded expander') + content
           tag_options[:class] += ' open'
         else
           if params[:indent]
             params = params.dup
-            params[:indent] += 12
+            params[:indent] += 18
           end
         end
         style = "position: absolute;top:#{params[:top]}px;left:#{params[:indent]}px;"

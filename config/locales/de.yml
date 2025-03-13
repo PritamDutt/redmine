@@ -257,7 +257,7 @@ de:
   error_attachment_too_big: Diese Datei kann nicht hochgeladen werden, da sie die maximale Dateigröße von (%{max_size}) überschreitet.
   error_can_not_archive_project: Dieses Projekt kann nicht archiviert werden.
   error_can_not_delete_custom_field: Kann das benutzerdefinierte Feld nicht löschen.
-  error_can_not_delete_tracker: Dieser Tracker enthält Tickets und kann nicht gelöscht werden.
+  error_can_not_delete_tracker_html: Dieser Tracker enthält Tickets und kann nicht gelöscht werden.<p>The following projects have issues with this tracker:<br>%{projects}</p>
   error_can_not_remove_role: Diese Rolle wird verwendet und kann nicht gelöscht werden.
   error_can_not_reopen_issue_on_closed_version: Das Ticket ist einer abgeschlossenen Version zugeordnet und kann daher nicht wieder geöffnet werden.
   error_can_t_load_default_data: "Die Standard-Konfiguration konnte nicht geladen werden: %{value}"
@@ -1457,3 +1457,9 @@ de:
   setting_issue_done_ratio_interval: Done ratio options interval
   setting_copy_attachments_on_issue_copy: Copy attachments on copy
   field_thousands_delimiter: Thousands delimiter
+  label_involved_principals: Author / Previous assignee
+  label_attachment_summary:
+    zero: "%{filename}"
+    one: "%{filename} and 1 file"
+    other: "%{filename} and %{count} files"
+  setting_wiki_tablesort_enabled: Javascript-basierte Tabellensortierung in Wiki-Inhalten

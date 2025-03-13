@@ -20,22 +20,6 @@
 require_relative '../test_helper'
 
 class CalendarsControllerTest < Redmine::ControllerTest
-  fixtures :projects,
-           :trackers,
-           :projects_trackers,
-           :roles,
-           :member_roles,
-           :members,
-           :enabled_modules,
-           :issues,
-           :issue_statuses,
-           :issue_relations,
-           :issue_categories,
-           :enumerations,
-           :queries,
-           :users, :email_addresses,
-           :versions
-
   def test_show
     # Ensure that an issue to which a user is assigned is in the current
     # month's calendar in order to test Gravatar
@@ -219,14 +203,14 @@ class CalendarsControllerTest < Redmine::ControllerTest
 
     assert_select 'ul' do
       assert_select 'li.week-number:nth-of-type(2)', :text => /53$/
-      assert_select 'li.odd', :text => /^27/
-      assert_select 'li.even', :text => /^2/
+      assert_select 'li.other-month', :text => /^27/
+      assert_select 'li.this-month', :text => /^2/
     end
 
     assert_select 'ul' do
       assert_select 'li.week-number', :text => /1$/
-      assert_select 'li.odd', :text => /^3/
-      assert_select 'li.even', :text => /^9/
+      assert_select 'li.other-month', :text => /^3/
+      assert_select 'li.this-month', :text => /^9/
     end
 
     with_settings :start_of_week => 1 do
@@ -242,14 +226,14 @@ class CalendarsControllerTest < Redmine::ControllerTest
 
     assert_select 'ul' do
       assert_select 'li.week-number:nth-of-type(2)', :text => /53$/
-      assert_select 'li.even', :text => /^28/
-      assert_select 'li.even', :text => /^3/
+      assert_select 'li.this-month', :text => /^28/
+      assert_select 'li.this-month', :text => /^3/
     end
 
     assert_select 'ul' do
       assert_select 'li.week-number', :text => /1$/
-      assert_select 'li.even', :text => /^4/
-      assert_select 'li.even', :text => /^10/
+      assert_select 'li.this-month', :text => /^4/
+      assert_select 'li.this-month', :text => /^10/
     end
   end
 

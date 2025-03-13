@@ -1,8 +1,8 @@
 inherit_from: .rubocop_todo.yml
 
 AllCops:
-  TargetRubyVersion: 3.0
-  TargetRailsVersion: 7.1
+  TargetRubyVersion: 3.1
+  TargetRailsVersion: 7.2
 
   NewCops: enable
 
@@ -168,6 +168,9 @@ Rails/Pluck:
 Rails/RootPathnameMethods:
   Enabled: false
 
+Rails/SkipsModelValidations:
+  Enabled: false
+
 Rails/SquishedSQLHeredocs:
   Enabled: false
 
@@ -209,7 +212,7 @@ Style/EmptyElse:
   EnforcedStyle: empty
 
 Style/FormatString:
-  EnforcedStyle: sprintf
+  Enabled: false
 
 Style/FormatStringToken:
   Enabled: false
@@ -228,6 +231,7 @@ Style/GlobalStdStream:
 
 Style/HashSyntax:
   EnforcedStyle: no_mixed_keys
+  EnforcedShorthandSyntax: either
 
 Style/HashEachMethods:
   Exclude:
@@ -241,6 +245,10 @@ Style/IdenticalConditionalBranches:
 
 Style/InverseMethods:
   Enabled: false
+
+Style/MultipleComparison:
+  Enabled: true
+  ComparisonsThreshold: 3
 
 Style/NegatedIfElseCondition:
   Enabled: false

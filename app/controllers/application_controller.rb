@@ -28,9 +28,11 @@ class ApplicationController < ActionController::Base
   include Redmine::Hook::Helper
   include RoutesHelper
   include AvatarsHelper
+  include IconsHelper
 
   helper :routes
   helper :avatars
+  helper :icons
 
   class_attribute :accept_api_auth_actions
   class_attribute :accept_atom_auth_actions
@@ -261,7 +263,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_login
-    if !User.current.logged?
+    unless User.current.logged?
       # Extract only the basic url parameters on non-GET requests
       if request.get?
         url = request.original_url
@@ -297,7 +299,7 @@ class ApplicationController < ActionController::Base
   def require_admin
     return unless require_login
 
-    if !User.current.admin?
+    unless User.current.admin?
       render_403
       return false
     end
@@ -480,15 +482,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :back_url
 
-  def redirect_back_or_default(default, options={})
+  def redirect_back_or_default(default, options = {})
+    referer = options.delete(:referer)
+
     if back_url = validate_back_url(params[:back_url].to_s)
       redirect_to(back_url)
       return
-    elsif options[:referer]
+    elsif referer
       redirect_to_referer_or default
       return
     end
-    redirect_to default
+    redirect_to default, options
     false
   end
 
@@ -507,11 +511,9 @@ class ApplicationController < ActionController::Base
         if uri.send(component).present? && uri.send(component) != request.send(component)
           return false
         end
-
-        uri.send(:"#{component}=", nil)
       end
-      # Always ignore basic user:password in the URL
-      uri.userinfo = nil
+      # Remove unnecessary components to convert the URL into a relative URL
+      uri.omit!(:scheme, :authority)
     rescue Addressable::URI::InvalidURIError
       return false
     end
@@ -519,7 +521,7 @@ class ApplicationController < ActionController::Base
     path = uri.to_s
     # Ensure that the remaining URL starts with a slash, followed by a
     # non-slash character or the end
-    if !%r{\A/([^/]|\z)}.match?(path)
+    unless %r{\A/([^/]|\z)}.match?(path)
       return false
     end
 

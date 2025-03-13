@@ -72,7 +72,7 @@ class Principal < ApplicationRecord
       where({})
     else
       pattern = "%#{sanitize_sql_like q}%"
-      sql = +"LOWER(#{table_name}.login) LIKE LOWER(:p) ESCAPE :s"
+      sql = "LOWER(#{table_name}.login) LIKE LOWER(:p) ESCAPE :s"
       sql << " OR #{table_name}.id IN (SELECT user_id FROM #{EmailAddress.table_name} WHERE LOWER(address) LIKE LOWER(:p) ESCAPE :s)"
       params = {:p => pattern, :s => '\\'}
 
@@ -136,6 +136,10 @@ class Principal < ApplicationRecord
     nil
   end
 
+  def active?
+    self.status == STATUS_ACTIVE
+  end
+
   def visible?(user=User.current)
     Principal.visible(user).find_by(:id => id) == self
   end
@@ -155,7 +159,7 @@ class Principal < ApplicationRecord
     return -1 if principal.nil?
     return nil unless principal.is_a?(Principal)
 
-    if self.class.name == principal.class.name
+    if self.instance_of?(principal.class)
       self.to_s.casecmp(principal.to_s)
     else
       # groups after users

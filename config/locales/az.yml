@@ -288,7 +288,7 @@ az:
 
   error_can_not_remove_role: Bu rol istifadə edilir və silinə bilməz.
   error_can_not_delete_custom_field: Sazlanmış sahəni silmək mümkün deyildir
-  error_can_not_delete_tracker: Bu treker tapşırıqlardan ibarət olduğu üçün silinə bilməz.
+  error_can_not_delete_tracker_html: Bu treker tapşırıqlardan ibarət olduğu üçün silinə bilməz.<p>The following projects have issues with this tracker:<br>%{projects}</p>
   error_can_t_load_default_data: "Susmaya görə konfiqurasiya yüklənməmişdir: %{value}"
   error_issue_not_found_in_project: Tapşırıq tapılmamışdır və ya bu layihəyə bərkidilməmişdir
   error_scm_annotate: "Verilənlər mövcud deyildir və ya imzalana bilməz."
@@ -1585,3 +1585,9 @@ az:
   setting_issue_done_ratio_interval: Done ratio options interval
   setting_copy_attachments_on_issue_copy: Copy attachments on copy
   field_thousands_delimiter: Thousands delimiter
+  label_involved_principals: Author / Previous assignee
+  label_attachment_summary:
+    zero: "%{filename}"
+    one: "%{filename} and 1 file"
+    other: "%{filename} and %{count} files"
+  setting_wiki_tablesort_enabled: Javascript based table sorting in wiki content

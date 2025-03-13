@@ -19,12 +19,11 @@
 
 module Redmine
   module Search
-
     mattr_accessor :available_search_types
     @@available_search_types = []
 
     class << self
-      def map(&block)
+      def map(&)
         yield self
       end
 

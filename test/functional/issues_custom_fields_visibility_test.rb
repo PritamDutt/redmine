@@ -21,19 +21,6 @@ require_relative '../test_helper'
 
 class IssuesCustomFieldsVisibilityTest < Redmine::ControllerTest
   tests IssuesController
-  fixtures :projects,
-           :users, :email_addresses, :user_preferences,
-           :roles,
-           :members,
-           :member_roles,
-           :issue_statuses,
-           :trackers,
-           :projects_trackers,
-           :enabled_modules,
-           :enumerations,
-           :workflows,
-           :custom_fields, :custom_fields_trackers
-
   def setup
     CustomField.destroy_all
     Issue.delete_all
@@ -381,7 +368,7 @@ class IssuesCustomFieldsVisibilityTest < Redmine::ControllerTest
     assert_response :found
     users_to_test.each do |user, fields|
       mails = ActionMailer::Base.deliveries.select {|m| m.to.include? user.mail}
-      if (fields & [@field2, @field3]).any?
+      if fields.intersect?([@field2, @field3])
         assert_equal 1, mails.size, "User #{user.id} was not notified"
       else
         assert_equal 0, mails.size, "User #{user.id} was notified"

@@ -20,9 +20,6 @@
 require_relative '../test_helper'
 
 class AttachmentTest < ActiveSupport::TestCase
-  fixtures :users, :email_addresses, :projects, :roles, :members, :member_roles,
-           :enabled_modules, :issues, :trackers, :attachments
-
   def setup
     User.current = nil
     set_tmp_attachments_directory
@@ -80,7 +77,6 @@ class AttachmentTest < ActiveSupport::TestCase
   end
 
   def test_copy_should_preserve_attributes
-
     # prevent re-use of data from other attachments with equal contents
     Attachment.where('id <> 1').destroy_all
 
@@ -114,13 +110,13 @@ class AttachmentTest < ActiveSupport::TestCase
   end
 
   def test_filesize_greater_than_2gb_should_be_supported
-    with_settings :attachment_max_size => (50.gigabyte / 1024) do
+    with_settings :attachment_max_size => (50.gigabytes / 1024) do
       a = Attachment.create!(:container => Issue.find(1),
                              :file => uploaded_test_file("testfile.txt", "text/plain"),
                              :author => User.find(1))
-      a.filesize = 20.gigabyte
+      a.filesize = 20.gigabytes
       a.save!
-      assert_equal 20.gigabyte, a.reload.filesize
+      assert_equal 20.gigabytes, a.reload.filesize
     end
   end
 
@@ -468,7 +464,7 @@ class AttachmentTest < ActiveSupport::TestCase
     assert(
       Attachment.update_attachments(
         attachments,
-        {2 => {:filename => 'newname?.txt'},}
+        {2 => {:filename => 'newname?.txt'}}
       )
     )
     attachment = Attachment.find(2)

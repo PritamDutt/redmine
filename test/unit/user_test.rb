@@ -20,18 +20,6 @@
 require_relative '../test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  fixtures :users, :email_addresses, :members, :projects, :roles, :member_roles, :auth_sources,
-           :trackers, :issue_statuses,
-           :projects_trackers,
-           :watchers,
-           :issue_categories, :enumerations, :issues,
-           :journals, :journal_details,
-           :groups_users,
-           :enabled_modules,
-           :tokens,
-           :user_preferences,
-           :custom_fields, :custom_fields_projects, :custom_fields_trackers, :custom_values
-
   include Redmine::I18n
 
   def setup
@@ -308,12 +296,17 @@ class UserTest < ActiveSupport::TestCase
   def test_destroy_should_update_journals
     issue = Issue.generate!(:project_id => 1, :author_id => 2,
                           :tracker_id => 1, :subject => 'foo')
+    # Prepare a journal with both user_id and updated_by_id set to 2
     issue.init_journal(User.find(2), "update")
     issue.save!
+    journal = issue.journals.first
+    journal.update_columns(updated_by_id: 2)
 
     User.find(2).destroy
     assert_nil User.find_by_id(2)
-    assert_equal User.anonymous, issue.journals.first.reload.user
+    journal.reload
+    assert_equal User.anonymous, journal.user
+    assert_equal User.anonymous, journal.updated_by
   end
 
   def test_destroy_should_update_journal_details_old_value
@@ -559,6 +552,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_validate_password_complexity
+    set_language_if_valid 'en'
     user = users(:users_002)
     bad_passwords = [
       user.login,
@@ -572,7 +566,7 @@ class UserTest < ActiveSupport::TestCase
       user.password = p
       user.password_confirmation = p
       assert_not user.save
-      assert user.errors.full_messages.include?('Password is too simple')
+      assert_includes user.errors.full_messages, 'Password is too simple'
     end
   end
 

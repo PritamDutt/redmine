@@ -22,13 +22,6 @@ require_relative '../test_helper'
 class UsersControllerTest < Redmine::ControllerTest
   include Redmine::I18n
 
-  fixtures :users, :user_preferences, :email_addresses, :projects, :members, :member_roles, :roles,
-           :custom_fields, :custom_values, :groups_users,
-           :auth_sources,
-           :enabled_modules,
-           :issues, :issue_statuses,
-           :trackers
-
   def setup
     User.current = nil
     @request.session[:user_id] = 1 # admin
@@ -962,7 +955,6 @@ class UsersControllerTest < Redmine::ControllerTest
     ActionMailer::Base.deliveries.clear
     delete :destroy, :params => {:id => 1, :confirm => User.find(1).login}
     assert_nil ActionMailer::Base.deliveries.last
-
   end
 
   def test_update_unlock_admin_should_send_security_notification

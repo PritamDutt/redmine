@@ -24,7 +24,10 @@ Redmine::PluginLoader.load
 
 Rails.application.config.to_prepare do
   default_paths = []
-  Rails.application.config.assets.redmine_default_asset_path = Redmine::AssetPath.new(Rails.public_path, default_paths)
+  default_paths << Rails.root.join("app/assets/javascripts")
+  default_paths << Rails.root.join("app/assets/images")
+  default_paths << Rails.root.join("app/assets/stylesheets")
+  Rails.application.config.assets.redmine_default_asset_path = Redmine::AssetPath.new(Rails.root.join('app/assets'), default_paths)
 
   Redmine::FieldFormat::RecordList.subclasses.each do |klass|
     klass.instance.reset_target_class
@@ -40,3 +43,5 @@ Rails.application.config.to_prepare do
     Rails.application.config.assets.redmine_extension_paths << paths if paths.present?
   end
 end
+
+Rails.application.deprecators[:redmine] = ActiveSupport::Deprecation.new('7.0', 'Redmine')

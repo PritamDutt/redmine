@@ -50,12 +50,12 @@ module Redmine
     end
 
     def l_hours(hours)
-      hours = hours.to_f
+      hours = hours.to_f unless hours.is_a?(Numeric)
       l((hours < 2.0 ? :label_f_hour : :label_f_hour_plural), :value => format_hours(hours))
     end
 
     def l_hours_short(hours)
-      l(:label_f_hour_short, :value => format_hours(hours.to_f))
+      l(:label_f_hour_short, :value => format_hours(hours.is_a?(Numeric) ? hours : hours.to_f))
     end
 
     def ll(lang, str, arg=nil)
@@ -92,12 +92,13 @@ module Redmine
     def format_hours(hours)
       return "" if hours.blank?
 
+      minutes = (hours * 60).round
       if Setting.timespan_format == 'minutes'
-        h = hours.floor
-        m = ((hours - h) * 60).round
-        "%d:%02d" % [h, m]
+        h, m = minutes.abs.divmod(60)
+        sign = minutes.negative? ? '-' : ''
+        "%s%d:%02d" % [sign, h, m]
       else
-        number_with_delimiter(sprintf('%.2f', hours.to_f), delimiter: nil)
+        number_with_delimiter(sprintf('%.2f', minutes.fdiv(60)), delimiter: nil)
       end
     end
 
@@ -110,7 +111,7 @@ module Redmine
     #       will clash with the dot separator.
     def normalize_float(value)
       separator = ::I18n.t('number.format.separator')
-      value.gsub(/[#{separator}]/, separator => '.')
+      value.to_s.gsub(/[#{separator}]/, separator => '.')
     end
 
     def day_name(day)

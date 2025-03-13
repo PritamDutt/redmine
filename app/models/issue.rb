@@ -925,6 +925,18 @@ class Issue < ApplicationRecord
     result
   end
 
+  # Returns the assignee immediately prior to the current one from the issue history
+  def prior_assigned_to
+    prior_assigned_to_id =
+      journals.joins(:details)
+              .where(details: {prop_key: 'assigned_to_id'})
+              .where.not(details: {old_value: nil})
+              .order(id: :desc)
+              .pick(:old_value)
+
+    prior_assigned_to_id && Principal.find_by(id: prior_assigned_to_id)
+  end
+
   # Returns the initial status of the issue
   # Returns nil for a new issue
   def status_was
@@ -1018,7 +1030,7 @@ class Issue < ApplicationRecord
 
   # Returns true if this issue is blocked by another issue that is still open
   def blocked?
-    !relations_to.detect {|ir| ir.relation_type == 'blocks' && !ir.issue_from.closed?}.nil?
+    relations_to.any? {|ir| ir.relation_type == 'blocks' && ir.issue_from&.closed? == false}
   end
 
   # Returns true if this issue can be closed and if not, returns false and populates the reason
@@ -1459,7 +1471,7 @@ class Issue < ApplicationRecord
 
   # Returns a string of css classes that apply to the issue
   def css_classes(user=User.current)
-    s = +"issue tracker-#{tracker_id} status-#{status_id} #{priority.try(:css_classes)}"
+    s = "issue tracker-#{tracker_id} status-#{status_id} #{priority.try(:css_classes)}"
     s << ' closed' if closed?
     s << ' overdue' if overdue?
     s << ' child' if child?
@@ -2059,7 +2071,7 @@ class Issue < ApplicationRecord
 
   def add_auto_watcher
     if author&.active? &&
-        author&.allowed_to?(:add_issue_watchers, project) &&
+        author.allowed_to?(:add_issue_watchers, project) &&
         author.pref.auto_watch_on?('issue_created') &&
         self.watcher_user_ids.exclude?(author.id)
       self.set_watcher(author, true)

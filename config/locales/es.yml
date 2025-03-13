@@ -920,7 +920,7 @@ es:
   error_can_not_delete_custom_field: Fue imposible eliminar el campo personalizado
   error_unable_to_connect: Fue imposible conectarse (%{value})
   error_can_not_remove_role: Este rol está en uso y no puede ser eliminado.
-  error_can_not_delete_tracker: Este tipo contiene peticiones y no puede ser eliminado.
+  error_can_not_delete_tracker_html: Este tipo contiene peticiones y no puede ser eliminado.<p>The following projects have issues with this tracker:<br>%{projects}</p>
   field_principal: User or Group
   notice_failed_to_save_members: "Fallo al guardar miembro(s): %{errors}."
   text_zoom_out: Alejar
@@ -1559,3 +1559,9 @@ es:
   setting_issue_done_ratio_interval: Done ratio options interval
   setting_copy_attachments_on_issue_copy: Copy attachments on copy
   field_thousands_delimiter: Thousands delimiter
+  label_involved_principals: Author / Previous assignee
+  label_attachment_summary:
+    zero: "%{filename}"
+    one: "%{filename} and 1 file"
+    other: "%{filename} and %{count} files"
+  setting_wiki_tablesort_enabled: Javascript based table sorting in wiki content

@@ -208,7 +208,7 @@ bg:
   error_no_tracker_in_project: Няма асоциирани тракери с този проект. Проверете настройките на проекта.
   error_no_default_issue_status: Няма установено подразбиращо се състояние за задачите. Моля проверете вашата конфигурация (Вижте "Администрация -> Състояния на задачи").
   error_can_not_delete_custom_field: Невъзможност за изтриване на потребителско поле
-  error_can_not_delete_tracker: Този тракер съдържа задачи и не може да бъде изтрит.
+  error_can_not_delete_tracker_html: Този тракер съдържа задачи и не може да бъде изтрит.<p>The following projects have issues with this tracker:<br>%{projects}</p>
   error_can_not_remove_role: Тази роля се използва и не може да бъде изтрита.
   error_can_not_reopen_issue_on_closed_version: Задача, асоциирана със затворена версия не може да бъде отворена отново
   error_can_not_archive_project: Този проект не може да бъде архивиран
@@ -424,6 +424,7 @@ bg:
   field_estimated_remaining_hours: Изчислено оставащо време
   field_any_searchable: Всички обекти с текст (заглавие, описание, коментари на задачи, потребителски полета)
   field_last_activity_date: Последна активност
+  field_thousands_delimiter: Раделител на хилядите
 
   setting_app_title: Заглавие
   setting_welcome_text: Допълнителен текст
@@ -506,6 +507,7 @@ bg:
   setting_force_default_language_for_anonymous: Задължително език по подразбиране за анонимните потребители
   setting_force_default_language_for_loggedin: Задължително език по подразбиране за потребителите, влезли в Redmine
   setting_link_copied_issue: Свързване на задачите при копиране
+  setting_copy_attachments_on_issue_copy: Копиране на файловете при копиране
   setting_max_additional_emails: Максимален брой на допълнителните имейл адреси
   setting_email_domains_allowed: Разрешени имейл домейни
   setting_email_domains_denied: Забранени имейл домейни
@@ -718,6 +720,10 @@ bg:
   label_attachment_plural: Файлове
   label_file_added: Добавен файл
   label_attachment_description: Описание на файла
+  label_attachment_summary:
+    zero: "%{filename}"
+    one: "%{filename} и 1 файл"
+    other: "%{filename} и %{count} файла"
   label_report: Справка
   label_report_plural: Справки
   label_news: Новини
@@ -1146,6 +1152,7 @@ bg:
   label_default_query: Заявка по подразбиране
   label_edited: Редактирано
   label_time_by_author: "%{time} от %{author}"
+  label_involved_principals: Автор / Предишен назначен
 
   button_login: Вход
   button_submit: Изпращане
@@ -1436,5 +1443,4 @@ bg:
     За да потвърдите, въведете името (%{login}) по-долу.
   text_project_destroy_enter_identifier: За да потвърдите действието, въведете идентификатора на проекта (%{identifier}) по-долу.
   field_name_or_email_or_login: Име, e-mail или login име
-  setting_copy_attachments_on_issue_copy: Copy attachments on copy
-  field_thousands_delimiter: Thousands delimiter
+  setting_wiki_tablesort_enabled: Javascript based table sorting in wiki content
